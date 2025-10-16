@@ -1,6 +1,6 @@
 const categoryListData = [
 
-    {
+     {
         id:1,
         name:"Hotels",
         value:"lodging",

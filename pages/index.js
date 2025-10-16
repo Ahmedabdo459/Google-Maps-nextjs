@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import SearchBar from "@/components/SearchBar";
 import CategoryList from "@/components/CategoryList";
+import NearbyPlaces from "@/components/NearbyPlaces";
 
 
 const geistSans = Geist({
@@ -25,6 +26,8 @@ export default function Home() {
 
         <SearchBar/>
         <CategoryList/>
+        <NearbyPlaces/>
+
         </div>
         <div>Google Map</div>
        
