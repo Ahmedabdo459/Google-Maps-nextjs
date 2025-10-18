@@ -1,5 +1,14 @@
-import "@/styles/globals.css";
+// pages/_app.js
+import "../styles/globals.css";
+import "leaflet/dist/leaflet.css";
+import { UserLocationProvider } from "@/context/UserLocationContext";
 
-export default function App({ Component, pageProps }) {
-  return <Component {...pageProps} />;
+function MyApp({ Component, pageProps }) {
+  return (
+    <UserLocationProvider>
+      <Component {...pageProps} />
+    </UserLocationProvider>
+  );
 }
+
+export default MyApp;
