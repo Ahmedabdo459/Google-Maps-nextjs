@@ -1,6 +1,11 @@
-// auth/GlobalApi.js
+// src/auth/GlobalApi.js
 const OVERPASS_BASE = process.env.NEXT_PUBLIC_OVERPASS_API || "https://overpass-api.de/api/interpreter";
 
+/**
+ * category: string (مثل "restaurant" أو "cafe" أو "pharmacy")
+ * lat, lon: أرقام
+ * radius: بالمتر
+ */
 const runOverpassQuery = async (lat, lon, category = "restaurant", radius = 1000) => {
   const q = `[out:json][timeout:25];
 (
@@ -13,10 +18,7 @@ out center;`;
   const res = await fetch(OVERPASS_BASE, {
     method: "POST",
     body: q,
-    headers: {
-      "Content-Type": "text/plain",
-      "User-Agent": "Ahmed-Nextjs-App/1.0 (your.email@example.com)"
-    }
+    headers: { "Content-Type": "text/plain" },
   });
 
   if (!res.ok) throw new Error("Overpass request failed");
@@ -27,16 +29,15 @@ out center;`;
 const mapOverpassToResults = (overpassJson) => {
   const elements = overpassJson.elements || [];
   return elements.map((el) => {
-    const lat = el.lat ?? (el.center && el.center.lat);
-    const lon = el.lon ?? (el.center && el.center.lon);
+    const lat = el.lat ?? el.center?.lat;
+    const lon = el.lon ?? el.center?.lon;
     return {
       id: el.id,
-      name: el.tags?.name || null,
-      category: el.tags?.amenity || null,
+      name: el.tags?.name || "Unnamed place",
+      category: el.tags?.amenity || "Unknown",
       tags: el.tags || {},
       lat,
       lon,
-      raw: el
     };
   });
 };
@@ -46,7 +47,7 @@ const GlobalApi = {
     const data = await runOverpassQuery(lat, lon, category, radius);
     const results = mapOverpassToResults(data);
     return { data: { results } };
-  }
+  },
 };
 
 export default GlobalApi;

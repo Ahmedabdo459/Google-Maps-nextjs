@@ -1,17 +1,45 @@
-import React from 'react'
+"use client";
+// components/SearchBar.jsx
+// Search UI: select type + search button + radius input
+import React from "react";
 
-function SearchBar() {
+export default function SearchBar({ type, setType, radius, setRadius, onSearch, searching }) {
   return (
-    <div className='flex gap-3 bg-blue-100 p-3 rounded-2xl'>
+    <div className="bg-white rounded-xl shadow p-3 flex gap-2 items-center w-full max-w-2xl mx-auto">
+      <select
+        value={type}
+        onChange={(e) => setType(e.target.value)}
+        className="border rounded px-3 py-2 grow"
+        aria-label="Place type"
+      >
+        <option value="restaurant">Restaurants</option>
+        <option value="cafe">Cafes</option>
+        <option value="pharmacy">Pharmacies</option>
+        <option value="hospital">Hospitals</option>
+        <option value="school">Schools</option>
+        <option value="bank">Banks</option>
+        <option value="fuel">Fuel Stations</option>
+        <option value="mosque">Mosques</option>
+      </select>
 
-        <svg className='text-blue-300 w-[30px]' xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" >
-  <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-</svg>
+      <input
+        type="number"
+        min={200}
+        max={5000}
+        step={100}
+        value={radius}
+        onChange={(e) => setRadius(Number(e.target.value))}
+        className="w-28 border rounded px-3 py-2 text-sm"
+        aria-label="Search radius in meters"
+      />
 
-<input type='text' placeholder='Search For Something' className='outline-none w-full'/>
-
+      <button
+        onClick={onSearch}
+        disabled={searching}
+        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-60"
+      >
+        {searching ? "Searching..." : "Search"}
+      </button>
     </div>
-  )
+  );
 }
-
-export default SearchBar

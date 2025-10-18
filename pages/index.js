@@ -1,72 +1,105 @@
 // pages/index.js
-import React, { useContext, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import Navbar from "@/components/Navbar";
+import { useEffect, useState } from "react";
 import SearchBar from "@/components/SearchBar";
-import CategoryList from "@/components/CategoryList";
-import NearbyPlaces from "@/components/NearbyPlaces";
-import GlobalApi from "@/auth/GlobalApi";
-import { UserLocationContext } from "@/context/UserLocationContext";
-import { NearbyPlacesContext } from "@/context/NearbyPlacesContext";
-import { SelectedNearbyPlacesContext } from "@/context/SelectedNearbyPlacesContext";
+import NearbyList from "@/components/NearbyList";
+import { fetchNearbyPlaces } from "@/utils/overpass";
 
-// Load Leaflet map client-side only (no SSR)
+// Load Leaflet map client-side only (disable SSR)
 const LeafletMap = dynamic(() => import("@/components/LeafletMap"), { ssr: false });
 
-// simple cache outside component
-const cache = {};
-
 export default function Home() {
-  const [nearbyPlaces, setNearbyPlaces] = useState([]);
-  const { userLocation } = useContext(UserLocationContext);
-  const [selectedNearbyPlaces, setSelectedNearbyPlaces] = useState([]);
+  const [center, setCenter] = useState(null); // [lat, lon]
+  const [type, setType] = useState("restaurant");
+  const [radius, setRadius] = useState(1500);
+  const [places, setPlaces] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
 
+  // get user location on mount
   useEffect(() => {
-    if (userLocation) getNearbyPlaces();
-  }, [userLocation]);
+    if (typeof window === "undefined") return;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setCenter([pos.coords.latitude, pos.coords.longitude]);
+      },
+      (err) => {
+        console.warn("Geolocation error:", err);
+        // fallback: Cairo center
+        setCenter([30.0444, 31.2357]);
+      },
+      { enableHighAccuracy: true }
+    );
+  }, []);
 
-  const getNearbyPlaces = async (category = "restaurant") => {
-    if (!userLocation) return;
-    const key = `${category}_${userLocation.lat}_${userLocation.lng}`;
-    if (cache[key]) {
-      setNearbyPlaces(cache[key]);
-      return;
-    }
+  // search handler
+  async function handleSearch() {
+    if (!center) return;
     setLoading(true);
-    try {
-      const resp = await GlobalApi.getNearbyPlaces(category, userLocation.lat, userLocation.lng, 1000);
-      const results = resp?.data?.results || [];
-      cache[key] = results;
-      setNearbyPlaces(results);
-    } catch (err) {
-      console.error("getNearbyPlaces error:", err);
-      setNearbyPlaces([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+    setPlaces([]);
+    setSelectedId(null);
+
+    const [lat, lon] = center;
+    const res = await fetchNearbyPlaces(lat, lon, type, radius);
+
+    // log results for debugging
+    console.log("Overpass results:", res);
+
+    setPlaces(res);
+    setLoading(false);
+  }
+
+  // select place from list
+  function handleSelectPlace(place) {
+    setSelectedId(place.id);
+    // small timeout to ensure map exists and flyTo happens
+    setTimeout(() => {
+      setSelectedId(place.id);
+    }, 200);
+  }
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <SelectedNearbyPlacesContext.Provider value={{ selectedNearbyPlaces, setSelectedNearbyPlaces }}>
-        <NearbyPlacesContext.Provider value={{ nearbyPlaces, setNearbyPlaces }}>
-          <Navbar />
-          <div className="grid grid-cols-1 md:grid-cols-2 px-6 w-full mt-6 gap-6">
-            <div>
-              <SearchBar setUserLocation={(loc) => { /* optional: let SearchBar call context setter */ }} />
-              <CategoryList setSelectedCategory={(category) => getNearbyPlaces(category)} />
-              {loading ? <p className="mt-4">جاري تحميل الأماكن...</p> : <NearbyPlaces />}
-            </div>
+    <div className="min-h-screen bg-gray-50">
+      <header className="p-4 bg-white shadow">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
+          <h1 className="font-semibold text-lg">Nearby Places (Leaflet + Overpass)</h1>
+        </div>
+      </header>
 
-            <div>
-              <div className="sticky top-20">
-                <LeafletMap />
-              </div>
-            </div>
-          </div>
-        </NearbyPlacesContext.Provider>
-      </SelectedNearbyPlacesContext.Provider>
+      <main className="max-w-6xl mx-auto p-4 grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <section className="lg:col-span-2 h-[72vh] rounded overflow-hidden shadow">
+        <div className="p-4 bg-white mb-4">
+  <SearchBar
+    type={type}
+    setType={setType}
+    radius={radius}
+    setRadius={setRadius}
+    onSearch={handleSearch}
+    searching={loading}
+  />
+</div>
+
+<div className="h-[calc(85vh-72px)]">
+  {center ? (
+    <LeafletMap
+      center={center}
+      places={places}
+      selectedId={selectedId}
+      onMarkerClick={(p) => handleSelectPlace(p)}
+    />
+  ) : (
+    <div className="flex items-center justify-center h-full">
+      Determining location...
+    </div>
+  )}
+</div>
+        </section>
+
+        <aside className="shadow rounded bg-white p-2 h-[72vh] overflow-auto">
+          <h2 className="font-medium px-2 py-1">Results</h2>
+          {loading ? <div className="p-4">Searching...</div> : <NearbyList places={places} onSelect={handleSelectPlace} />}
+        </aside>
+      </main>
     </div>
   );
 }

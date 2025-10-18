@@ -5,6 +5,7 @@ import NearbyPlacesDetails from "@/components/NearbyPlacesDetails";
 
 function NearbyPlaces() {
   const { nearbyPlaces } = useContext(NearbyPlacesContext);
+  
 
   return (
     <div>
