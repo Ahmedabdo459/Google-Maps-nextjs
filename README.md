@@ -1,40 +1,151 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# Google Maps with Next.js
+
+A modern Google Maps integration built with Next.js, featuring location search, custom markers, and interactive map functionality.
+
+## Features
+
+- Interactive Google Maps integration
+- Location search with autocomplete
+- Custom markers and info windows
+- Responsive design
+- Fast performance with Next.js
+- Easy navigation and user-friendly interface
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Node.js 18+ installed
+- Google Maps API key
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/Ahmedabdo459/Google-Maps-nextjs.git
+   cd Google-Maps-nextjs
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Environment Setup**
+   Create a `.env.local` file in the root directory:
+   ```env
+   NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_google_maps_api_key_here
+   ```
+
+4. **Get Google Maps API Key**
+   - Visit Google Cloud Console
+   - Enable the following APIs:
+     - Maps JavaScript API
+     - Places API
+     - Geocoding API
+   - Create credentials (API key)
+
+5. **Run the development server**
+   ```bash
+   npm run dev
+   ```
+
+6. **Open your browser**
+   Navigate to http://localhost:3000
+
+## Built With
+
+- **Framework**: Next.js
+- **Maps**: Google Maps JavaScript API
+- **Styling**: CSS Modules/Tailwind CSS
+- **Deployment**: Vercel (recommended)
+
+## Project Structure
+
+```
+google-maps-nextjs/
+├── components/
+│   ├── Map/
+│   ├── Search/
+│   └── UI/
+├── pages/
+│   ├── api/
+│   ├── index.js
+│   └── _app.js
+├── styles/
+├── public/
+└── utils/
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Usage
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+1. **Search for locations** using the search bar
+2. **Click on markers** to view location details
+3. **Drag and zoom** the map for navigation
+4. **Customize markers** and info windows as needed
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+## Configuration
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+### Customizing Map Options
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Edit the map configuration in `components/Map/Map.js`:
 
-## Learn More
+```javascript
+const mapOptions = {
+  zoom: 12,
+  center: { lat: 30.0444, lng: 31.2357 }, // Default Cairo, Egypt
+  styles: [...], // Custom map styles
+  disableDefaultUI: false,
+  zoomControl: true
+}
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Deployment
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+### Deploy on Vercel
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run build
+# Deploy to Vercel
+vercel --prod
+```
 
-## Deploy on Vercel
+### Environment Variables for Production
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Make sure to set your environment variables in your deployment platform:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+- `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`
+
+## Contributing
+
+1. Fork the project
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Important Notes
+
+- Keep your API keys secure and never commit them to version control
+- Be aware of Google Maps API usage limits and pricing
+- Ensure proper CORS configuration for production deployment
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Map not loading**: Check your API key and ensure required APIs are enabled
+2. **Search not working**: Verify Places API is enabled
+3. **Build errors**: Ensure all environment variables are set
+
+### Support
+
+For support and questions, please open an issue on GitHub.
+
+---
+
+**Developed by Ahmed Abdo**
